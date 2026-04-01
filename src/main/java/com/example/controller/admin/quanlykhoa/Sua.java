@@ -2,8 +2,9 @@ package com.example.controller.admin.quanlykhoa;
 
 import java.io.IOException;
 import java.util.Map;
-
+import java.util.List;
 import com.example.data.ChucNangSQL;
+import com.example.model.tblKhoa;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,10 +20,16 @@ public class Sua extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         String maKhoa = req.getParameter("MaKhoa");
-        Map<String, Object> khoa = sql.hienThi_DieuKien("tblKhoa", "MaKhoa='" + maKhoa + "'").get(0);
+        List<Map<String, Object>> khoa = sql.hienThi_DieuKien("tblKhoa", "MaKhoa='" + maKhoa + "'");
+         for (Map<String, Object> i : khoa) {
+                        // ?Định dạng lại ngày tháng về dạng năm-tháng-ngày trước khi hiển thị lên trang
+                        khoa.get(0).put("NgayThanhLapKhoa",
+                                        sql.doiDinhDangNgay_ViewEdit(i.get("NgayThanhLapKhoa").toString()));
+                }
         req.setAttribute("danhSachVien", sql.hienThi("tblVien"));
-        req.setAttribute("khoa", khoa);
+        req.setAttribute("khoa", khoa.get(0));
         req.getRequestDispatcher("/admin/danhsachkhoa/sua.jsp").forward(req, resp);
+        
     }
 
     @Override
@@ -34,11 +41,20 @@ public class Sua extends HttpServlet {
         String tenTruongKhoa = req.getParameter("TenTruongKhoa");
         String soDienThoaiKhoa = req.getParameter("SoDienThoaiKhoa");
         String emailKhoa = req.getParameter("EmailKhoa");
-        String ngayThanhLapKhoa = req.getParameter("NgayThanhLapKhoa");
+        String ngayThanhLapKhoa = sql.doiDinhDangNgay(req.getParameter("NgayThanhLapKhoa"));
         String moTaKhoa = req.getParameter("MoTaKhoa");
 
-        // sql.suaKhoa(maKhoa, tenKhoa, maVien, tenTruongKhoa, soDienThoaiKhoa,
-        // emailKhoa, ngayThanhLapKhoa, moTaKhoa);
+        tblKhoa khoa = new tblKhoa(req);
+        khoa.maKhoa = maKhoa;
+        khoa.tenKhoa = tenKhoa;
+        khoa.maVien = maVien;
+        khoa.tenTruongKhoa = tenTruongKhoa;
+        khoa.soDienThoaiKhoa = soDienThoaiKhoa;
+        khoa.emailKhoa = emailKhoa;
+        khoa.ngayThanhLapKhoa = ngayThanhLapKhoa;
+        khoa.moTaKhoa = moTaKhoa;
+        khoa.sua();
+
         req.getSession().setAttribute("thongBao", "Sửa khoa thành công");
         resp.sendRedirect(req.getContextPath() + "/admin/danhsachkhoa/index");
     }

@@ -2,10 +2,17 @@ package com.example.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import com.example.util.ExcelExporter;
+
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
 public class ChucNangSQL {
@@ -276,11 +283,11 @@ public class ChucNangSQL {
      * SQL: INSERT INTO tblDangKyHocPhan (...)
      * Các trường: MaDangKyHocPhan, MSSV, MaLopHocPhan, TrangThaiDangKyHocPhan
      */
-    public void themDangKyHocPhan(String maDangKyHocPhan, String mssv, String maLopHocPhan,
+    public void themDangKyHocPhan(String maDangKyHocPhan, String mssv, String maLopHocPhan, String ngayDangKy,
             String trangThaiDangKyHocPhan) {
         ql.ChayLenhSQL(
-                "INSERT INTO tblDangKyHocPhan (MaDangKyHocPhan, MSSV, MaLopHocPhan, TrangThaiDangKyHocPhan) VALUES ('"
-                        + maDangKyHocPhan + "', '" + mssv + "', '" + maLopHocPhan + "', '"
+                "INSERT INTO tblDangKyHocPhan (MaDangKyHocPhan, MSSV, MaLopHocPhan, NgayDangKy, TrangThaiDangKyHocPhan) VALUES ('"
+                        + maDangKyHocPhan + "', '" + mssv + "', '" + maLopHocPhan + "', '" + ngayDangKy + "', '"
                         + (trangThaiDangKyHocPhan == null ? "" : trangThaiDangKyHocPhan) + "');");
     }
 
@@ -289,12 +296,12 @@ public class ChucNangSQL {
      * SQL: UPDATE tblDangKyHocPhan SET ... WHERE MaDangKyHocPhan='...'
      * Các trường: MSSV, MaLopHocPhan, TrangThaiDangKyHocPhan
      */
-    public void suaDangKyHocPhan(String maDangKyHocPhan, String mssv, String maLopHocPhan,
+    public void suaDangKyHocPhan(String maDangKyHocPhan, String mssv, String maLopHocPhan, String ngayDangKy,
             String trangThaiDangKyHocPhan) {
         ql.ChayLenhSQL("UPDATE tblDangKyHocPhan SET MSSV='" + mssv + "', MaLopHocPhan='" + maLopHocPhan
-                + "', TrangThaiDangKyHocPhan='"
-                + (trangThaiDangKyHocPhan == null ? "" : trangThaiDangKyHocPhan) + "' WHERE MaDangKyHocPhan='"
-                + maDangKyHocPhan + "';");
+                + "', NgayDangKy='" + ngayDangKy + "', TrangThaiDangKyHocPhan='"
+                + (trangThaiDangKyHocPhan == null ? "" : trangThaiDangKyHocPhan)
+                + "' WHERE MaDangKyHocPhan='" + maDangKyHocPhan + "';");
     }
 
     // =========================
@@ -463,19 +470,32 @@ public class ChucNangSQL {
      * Thêm file vào thư mục uploads của ứng dụng.
      * Lưu file vào: /src/main/webapp/uploads/
      */
+
     public void themFile(Part filePart, ServletContext context) throws IOException {
         if (filePart != null && filePart.getSize() > 0) {
             String fileName = filePart.getSubmittedFileName();
             String uploadDir = context.getRealPath("/static/uploads");
-            System.err.println("Địa chỉ upload: " + uploadDir);
+            System.out.println("Địa chỉ upload: " + uploadDir);
+
             File dir = new File(uploadDir);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            String filePath = uploadDir + File.separator + fileName; // Sửa ở đây
+
+            String filePath = uploadDir + File.separator + fileName;
+            File file = new File(filePath);
+
+            // Nếu file đã tồn tại thì xóa
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (!deleted) {
+                    throw new IOException("Không thể xóa file cũ: " + fileName);
+                }
+            }
+
+            // Ghi file mới
             filePart.write(filePath);
         } else {
-            // loi
             throw new IOException("File rỗng hoặc không tồn tại");
         }
     }
@@ -494,43 +514,48 @@ public class ChucNangSQL {
      * @param maSo     Mã số dùng để đặt tên file.
      */
 
-    public void themFile_Ma(Part filePart, ServletContext context, String maSo) throws IOException {
+    public String themFile_Ma(Part filePart, ServletContext context, String maSo) throws IOException {
         if (filePart != null && filePart.getSize() > 0) {
             String fileName = filePart.getSubmittedFileName();
             String extension = "";
 
-            // Lấy phần mở rộng nếu có
+            // ?Lấy phần đuôi file
             int dotIndex = fileName.lastIndexOf('.');
             if (dotIndex > 0) {
-                extension = fileName.substring(dotIndex); // ví dụ: ".jpg"
+                extension = fileName.substring(dotIndex);
             }
 
+            // Đường dẫn thư mục upload
             String uploadDir = context.getRealPath("/static/uploads");
-            System.err.println("Địa chỉ upload: " + uploadDir);
+            Path uploadPath = Paths.get(uploadDir);
 
-            File dir = new File(uploadDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            // Tạo thư mục nếu chưa tồn tại
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
             }
 
             // Đặt tên file theo maSo + extension
-            String filePath = uploadDir + File.separator + maSo + extension;
-            File oldFile = new File(filePath);
+            Path filePath = uploadPath.resolve(maSo + extension);
 
             // Nếu file cũ tồn tại thì xóa
-            if (oldFile.exists()) {
-                System.out.println("File cũ tồn tại, đang xóa...");
-                oldFile.delete();
+            if (Files.exists(filePath)) {
+                boolean deleted = Files.deleteIfExists(filePath);
+                if (!deleted) {
+                    throw new IOException("Không thể xóa file cũ: " + filePath.getFileName());
+                }
+                System.out.println("Đã xóa file cũ: " + filePath.getFileName());
             }
 
             // Ghi file mới
-            filePart.write(filePath);
+            filePart.write(filePath.toString());
             System.out.println("Upload thành công: " + filePath);
+            return maSo + extension;
         } else {
             throw new IOException("File rỗng hoặc không tồn tại");
         }
     }
 
+    // !Có thể không sử dụng
     // =========================
     // * Bổ sung dữ liệu cho danh sách theo mã số (Chưa bao quát)
     // =========================
@@ -631,4 +656,71 @@ public class ChucNangSQL {
         }
         return ngayThangNamSQL;
     }
+
+    // =========================
+    // * Kiểm tra đăng nhập
+    // =========================
+    public void kiemTraDangNhap(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        var session = ((HttpServletRequest) request).getSession();
+        String role = (String) session.getAttribute("SS_ChucVu");
+        System.out.println("chuc vu: " + role);
+        String path = request.getServletPath();
+        if (role != null) {
+            String roleLower = role.toLowerCase();
+            if (path.startsWith("/admin") && roleLower.equals("admin")) {
+            } else if (path.startsWith("/giangvien")
+                    && (roleLower.equals("giangvien") || roleLower.equals("giảng viên"))) {
+            } else if (path.startsWith("/sinhvien")
+                    && (roleLower.equals("sinhvien") || roleLower.equals("sinh viên"))) {
+            } else {
+                session.setAttribute("loiDangNhap",
+                        "Vui lòng đăng nhập đúng tài khoản chức vụ được giao tương ứng để tiếp tục");
+                response.sendRedirect(request.getContextPath() + "/taikhoan/dangnhap");
+            }
+        } else {
+            session.setAttribute("loiDangNhap", "Vui lòng đăng nhập để tiếp tục");
+            response.sendRedirect(request.getContextPath() + "/taikhoan/dangnhap");
+        }
+    }
+    // =========================
+    // * Chuyển đổi List<Map<String, Object>> sang Excel
+    // =========================
+
+    /**
+     * Xuất dữ liệu từ List<Map<String, Object>> sang file Excel
+     * 
+     * @param data     Danh sách dữ liệu cần xuất
+     * @param filePath Đường dẫn file Excel (ví dụ: "C:/exports/data.xlsx")
+     * @throws IOException nếu có lỗi ghi file
+     */
+    public void xuatExcel(List<Map<String, Object>> data, String ten) throws IOException {
+        String filePath = "src/main/webapp/static/fileExcel/" + ten + ".xlsx";
+        ExcelExporter.exportToExcel(data, filePath);
+    }
+
+    // /**
+    // * Xuất dữ liệu từ List<Map<String, Object>> sang file Excel
+    // *
+    // * @param data Danh sách dữ liệu cần xuất
+    // * @param filePath Đường dẫn file Excel (ví dụ: "C:/exports/data.xlsx")
+    // * @throws IOException nếu có lỗi ghi file
+    // */
+    // public void xuatExcel(List<Map<String, Object>> data, String filePath) throws
+    // IOException {
+    // ExcelExporter.exportToExcel(data, filePath);
+    // }
+
+    /**
+     * Xuất dữ liệu từ List<Map<String, Object>> sang file Excel với tên sheet tùy
+     * chỉnh
+     * 
+     * @param data      Danh sách dữ liệu cần xuất
+     * @param filePath  Đường dẫn file Excel (ví dụ: "C:/exports/data.xlsx")
+     * @param sheetName Tên của sheet trong file Excel
+     * @throws IOException nếu có lỗi ghi file
+     */
+    public void xuatExcel(List<Map<String, Object>> data, String filePath, String sheetName) throws IOException {
+        ExcelExporter.exportToExcel(data, filePath, sheetName);
+    }
+
 }

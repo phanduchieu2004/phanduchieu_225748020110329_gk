@@ -1,9 +1,11 @@
 package com.example.controller.admin.quanlysinhvien;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import com.example.data.ChucNangSQL;
+import com.example.model.tblNganh;
 import com.example.model.tblSinhVien;
 
 import jakarta.servlet.ServletException;
@@ -24,7 +26,17 @@ public class Sua extends HttpServlet {
             throws ServletException, IOException {
         String mssv = req.getParameter("MSSV");
         Map<String, Object> sv = sql.hienThi_DieuKien("tblSinhVien", "MSSV='" + mssv + "'").get(0);
-        req.setAttribute("danhSachLop", sql.hienThi("tblLop"));
+        sv.put("NgaySinhSV", sql.doiDinhDangNgay_ViewEdit(sv.get("NgaySinhSV").toString()));
+        List<Map<String, Object>> danhSachLop = sql.hienThi("tblLop");
+        for (Map<String, Object> map : danhSachLop) {
+            tblNganh nganh = new tblNganh();
+            System.out.println("MaNganh: " + map.get("MaNganh").toString());
+            nganh.truyVanTheoMa(map.get("MaNganh").toString());
+            System.out.println("TenNganh: " + nganh.tenNganh);
+            map.put("TenNganh", nganh.tenNganh);
+        }
+        req.setAttribute("danhSachLop", danhSachLop);
+
         req.setAttribute("sv", sv);
         req.getRequestDispatcher("/admin/danhsachsinhvien/sua.jsp").forward(req, resp);
     }
@@ -42,14 +54,19 @@ public class Sua extends HttpServlet {
         String soDienThoaiSV = req.getParameter("SoDienThoaiSV");
         String trangThaiSV = req.getParameter("TrangThaiSV");
         Part fileAnh = req.getPart("AnhSV");
-        sql.themFile(fileAnh, req.getServletContext());
-        // !TODO: Xử lý cơ sở dữ liệu trước
-        // sql.suaSinhVien(mssv, hoTenSV, ngaySinhSV, gioiTinhSV, queQuanSV, emailSV,
-        tblSinhVien sv = new tblSinhVien(mssv, hoTenSV, ngaySinhSV, gioiTinhSV, queQuanSV, emailSV, maLop,
-                soDienThoaiSV, fileAnh.getSubmittedFileName(), trangThaiSV);
+
+        tblSinhVien sv = new tblSinhVien(req);
+        sv.mssv = mssv;
+        sv.hoTenSV = hoTenSV;
+        sv.ngaySinhSV = ngaySinhSV;
+        sv.gioiTinhSV = gioiTinhSV;
+        sv.queQuanSV = queQuanSV;
+        sv.emailSV = emailSV;
+        sv.maLop = maLop;
+        sv.soDienThoaiSV = soDienThoaiSV;
+        sv.trangThaiSV = trangThaiSV;
+        sv.setAnhSV(fileAnh);
         sv.sua();
-        // maLop, soDienThoaiSV,
-        // fileAnh.getSubmittedFileName());
         req.getSession().setAttribute("thongBao", "Sửa sinh viên thành công");
         resp.sendRedirect(req.getContextPath() + "/admin/danhsachsinhvien/index");
     }

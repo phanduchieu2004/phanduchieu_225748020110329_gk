@@ -243,6 +243,12 @@ public class tblLopHocPhan {
         return tenHocPhan;
     }
 
+    public int getSoLuongDangKy() {
+        int soLuongDangKy = sql.hienThi_DieuKien("tblDangKyHocPhan",
+                "MaLopHocPhan = '" + this.maLopHocPhan + "'").size();
+        return soLuongDangKy;
+    }
+
     // * Lay tong the
     public String getTblHocPhan(String tenTruongCanLay) {
         String kq = sql.timKiem(tenTruongCanLay, "tblHocPhan",

@@ -1,16 +1,6 @@
 package com.example.controller;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import com.example.data.ChucNangSQL;
-import com.example.model.tblDangKyHocPhan;
-import com.example.model.tblKhoa;
-import com.example.model.tblLopHocPhan;
-import com.example.model.tblNganh;
-import com.example.model.tblSinhVien;
-import com.example.model.tblVien;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,38 +8,33 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet({ "/admin/index", "/admin/" })
+@WebServlet({ "/index" })
 public class Index extends HttpServlet {
-    ChucNangSQL sql = new ChucNangSQL();
 
     @Override
     protected void doGet(HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
+        String role = (String) req.getSession().getAttribute("SS_ChucVu");
+        String path = req.getServletPath();
+        if (role != null) {
+            String roleLower = role.toLowerCase();
+            if (path.startsWith("/admin") && roleLower.equals("admin")) {
 
-        System.out.println("");
+            } else if (path.startsWith("/giangvien") && (roleLower.equals("giangvien") || roleLower.equals("giảng viên"))) {
 
-        req.getRequestDispatcher("/admin/index.jsp").forward(req, resp);
-    }
+            } else if (path.startsWith("/sinhvien") && (roleLower.equals("sinhvien") || roleLower.equals("sinh viên"))) {
 
-    @Override
-    protected void doPost(HttpServletRequest req,
-            HttpServletResponse resp)
-            throws ServletException, IOException {
+            } else {
+                req.getSession().setAttribute("loiDangNhap",
+                        "Vui lòng đăng nhập đúng tài khoản chức vụ được giao tương ứng để tiếp tục");
+                resp.sendRedirect(req.getContextPath() + "/taikhoan/dangnhap");
+            }
 
-        // *Lay duoc thong tin sinh vien lop hoc phan
-        // vien khoa nganh hien tenvien tenkhoa trong bang nganh
-      List<Map<String, Object>> danhsach = sql.hienThi("tblDangKyHocPhan");
-        for (Map<String, Object> i : danhsach) {
-            tblDangKyHocPhan dk = new tblDangKyHocPhan();
-            dk.truyVanTheoMa(i.get("MaDangKyHocPhan").toString());
-            tblSinhVien sv = new tblSinhVien();
-            sv.truyVanTheoMa(dk.mssv);
-            tblLopHocPhan l = new tblLopHocPhan();
-            l.truyVanTheoMa(dk.maLopHocPhan);
-            System.out.println(dk.maDangKyHocPhan +"-------"+sv.hoTenSV + "-----"+ l.tenLopHocPhan + "---"+ l.soTuanHoc);
+        } else {
+            req.getSession().setAttribute("loiDangNhap", "Vui lòng đăng nhập để tiếp tục");
+            resp.sendRedirect(req.getContextPath() + "/taikhoan/dangnhap");
         }
-
-        req.getRequestDispatcher("/admin/index.jsp").forward(req, resp);
     }
+
 }

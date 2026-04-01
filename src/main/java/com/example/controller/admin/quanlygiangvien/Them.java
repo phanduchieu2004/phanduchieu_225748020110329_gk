@@ -23,6 +23,12 @@ public class Them extends HttpServlet {
     protected void doGet(HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
+        // Kiểm tra đăng nhập
+        // try {
+        // sql.kiemTraDangNhap(req, resp);
+        // } catch (Exception e) {
+        // System.out.println("Lỗi: " + e.getMessage());
+        // }
 
         // Lấy danh sách ngành để hiển thị trong form
         req.setAttribute("danhSachNganh", sql.hienThi("tblNganh"));
@@ -56,8 +62,8 @@ public class Them extends HttpServlet {
         gv.setMaNganh(maNganh);
         gv.setSoDienThoaiGV(soDienThoaiGV);
         gv.setTrangThaiGV(trangThaiGV);
-        gv.setAnhGV(fileAnh != null ? fileAnh.getSubmittedFileName() : null);
-            
+        gv.setAnhGV(fileAnh);
+
         // Kiểm tra dữ liệu
         if (gv.bao_loi) {
             req.setAttribute("MSGV", msgv);
@@ -75,9 +81,6 @@ public class Them extends HttpServlet {
             req.getRequestDispatcher("/admin/danhsachgiangvien/them.jsp").forward(req, resp);
             return;
         } else {
-            // Lưu file ảnh
-            sql.themFile(fileAnh, req.getServletContext());
-            // Thêm giảng viên vào CSDL
             gv.them();
         }
 

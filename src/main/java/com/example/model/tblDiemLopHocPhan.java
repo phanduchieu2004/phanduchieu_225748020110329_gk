@@ -46,14 +46,32 @@ public class tblDiemLopHocPhan {
     }
 
     public void truyVanTheoMa(String ma) {
+        if (ma == null || ma.trim().isEmpty()) {
+            bao_loi = true;
+            return;
+        }
+
         this.maDiemLopHocPhan = ma;
         this.maDangKyHocPhan = sql.timKiem("MaDangKyHocPhan", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'");
-        this.diemQuaTrinh = Double
-                .valueOf(sql.timKiem("DiemQuaTrinh", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'"));
-        this.diemThi = Double.valueOf(sql.timKiem("DiemThi", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'"));
-        this.diemTongKet = Double
-                .valueOf(sql.timKiem("DiemTongKet", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'"));
-        this.xepLoai = sql.timKiem("XepLoai", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'");
+
+        try {
+            String diemQuaTrinhStr = sql.timKiem("DiemQuaTrinh", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'");
+            this.diemQuaTrinh = (diemQuaTrinhStr != null && !diemQuaTrinhStr.isEmpty())
+                    ? Double.valueOf(diemQuaTrinhStr)
+                    : 0.0;
+
+            String diemThiStr = sql.timKiem("DiemThi", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'");
+            this.diemThi = (diemThiStr != null && !diemThiStr.isEmpty()) ? Double.valueOf(diemThiStr) : 0.0;
+
+            String diemTongKetStr = sql.timKiem("DiemTongKet", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'");
+            this.diemTongKet = (diemTongKetStr != null && !diemTongKetStr.isEmpty()) ? Double.valueOf(diemTongKetStr)
+                    : 0.0;
+
+            this.xepLoai = sql.timKiem("XepLoai", "tblDiemLopHocPhan", "MaDiemLopHocPhan='" + ma + "'");
+        } catch (NumberFormatException e) {
+            System.err.println("Lỗi chuyển đổi điểm thành số: " + e.getMessage());
+            bao_loi = true;
+        }
     }
 
     public void setMaDiemLopHocPhan(String ma) {
@@ -76,7 +94,7 @@ public class tblDiemLopHocPhan {
 
     public void setDiemQuaTrinh(Double diem) {
         if (diem == null || diem < 0 || diem > 10) {
-            request.setAttribute("loiDiemQuaTrinh", "Điểm quá trình phải từ 0 đến 10");
+            request.getSession().setAttribute("loiDiemQuaTrinh", "Điểm quá trình phải từ 0 đến 10");
             bao_loi = true;
         } else {
             this.diemQuaTrinh = diem;
@@ -85,7 +103,7 @@ public class tblDiemLopHocPhan {
 
     public void setDiemThi(Double diem) {
         if (diem == null || diem < 0 || diem > 10) {
-            request.setAttribute("loiDiemThi", "Điểm thi phải từ 0 đến 10");
+            request.getSession().setAttribute("loiDiemThi", "Điểm thi phải từ 0 đến 10");
             bao_loi = true;
         } else {
             this.diemThi = diem;
@@ -93,20 +111,32 @@ public class tblDiemLopHocPhan {
     }
 
     public void setDiemTongKet() {
+        if (this.diemQuaTrinh == null || this.diemThi == null) {
+            return;
+        }
         this.diemTongKet = this.diemQuaTrinh * 0.5 + this.diemThi * 0.5;
     }
 
     public void setXepLoai() {
-        if (this.diemTongKet > 8) {
-            this.xepLoai = "Giỏi";
-        } else if (this.diemTongKet >= 6.5) {
-            this.xepLoai = "Khá";
-        } else if (this.diemTongKet >= 5) {
-            this.xepLoai = "Trung Bình";
-        } else {
-            this.xepLoai = "Yếu";
+        if (this.diemTongKet == null) {
+            return;
         }
-        System.out.println("Xếp loại: " + this.xepLoai + "?");
+        if (this.diemTongKet >= 8.5) {
+            this.xepLoai = "A";
+        } else if (this.diemTongKet >= 7.5) {
+            this.xepLoai = "B+";
+        } else if (this.diemTongKet >= 6.5) {
+            this.xepLoai = "B";
+        } else if (this.diemTongKet >= 5.5) {
+            this.xepLoai = "C+";
+        } else if (this.diemTongKet >= 5.0) {
+            this.xepLoai = "C";
+        } else if (this.diemTongKet >= 4.0) {
+            this.xepLoai = "D+";
+        } else {
+            this.xepLoai = "D";
+        }
+        System.out.println("Xếp loại: " + this.xepLoai);
     }
 
     // *get

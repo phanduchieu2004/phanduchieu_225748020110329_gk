@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.data.ChucNangSQL;
+import com.example.model.tblNganh;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,8 +20,16 @@ public class Index extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        try {
+            sql.kiemTraDangNhap(req, resp);
+        } catch (Exception e) {
+        }
         List<Map<String, Object>> danhsach = sql.hienThi("tblLop");
-        sql.boSungDS(danhsach, "TenNganh", "tblNganh", "MaNganh");
+        for (Map<String, Object> map : danhsach) {
+            tblNganh nganh = new tblNganh();
+            nganh.truyVanTheoMa(map.get("MaNganh").toString());
+            map.put("TenNganh", nganh.tenNganh);
+        }
         req.setAttribute("danhSachLop", danhsach);
         req.getRequestDispatcher("/admin/danhsachlop/index.jsp").forward(req, resp);
     }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.example.data.ChucNangSQL;
+import com.example.model.tblNganh;
+
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -38,7 +40,12 @@ public class Sua extends HttpServlet {
         String maKhoa = req.getParameter("MaKhoa");
         String moTaNganh = req.getParameter("MoTaNganh");
 
-        // sql.suaNganh(maNganh, tenNganh, maKhoa, moTaNganh);
+        tblNganh nganh = new tblNganh();
+        nganh.maNganh = maNganh;
+        nganh.tenNganh = tenNganh;
+        nganh.maKhoa = maKhoa;
+        nganh.moTaNganh = moTaNganh;
+        nganh.sua();
         req.getSession().setAttribute("thongBao", "Sửa ngành thành công");
         resp.sendRedirect(req.getContextPath() + "/admin/danhsachnganh/index");
     }

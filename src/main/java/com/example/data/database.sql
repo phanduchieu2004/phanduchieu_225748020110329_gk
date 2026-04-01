@@ -1,3 +1,23 @@
+-- !Mã số sinh viên bắt đầu bằng số: 20
+-- !Mã số giảng viên bắt đầu bằng số: 10
+-- !Mã số admin bắt đầu bằng số: 00
+
+
+
+Drop TABLE IF EXISTS tblVien;
+Drop TABLE IF EXISTS tblKhoa;
+Drop TABLE IF EXISTS tblNganh;
+Drop TABLE IF EXISTS tblLop;
+Drop TABLE IF EXISTS tblGiangVien;
+Drop TABLE IF EXISTS tblSinhVien;
+Drop TABLE IF EXISTS tblHocPhan;
+Drop TABLE IF EXISTS tblLopHocPhan;
+Drop TABLE IF EXISTS tblDangKyHocPhan;
+Drop TABLE IF EXISTS tblDiemLopHocPhan;
+Drop TABLE IF EXISTS tblDiemDanh;
+Drop TABLE IF EXISTS tblTaiKhoan;
+
+
 -- Tạo bảng tblVien
 CREATE TABLE IF NOT EXISTS tblVien (
     IDVien INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,6 +122,7 @@ CREATE TABLE IF NOT EXISTS tblDangKyHocPhan (
     MaDangKyHocPhan TEXT NULL,
     MSSV TEXT NULL,
     MaLopHocPhan TEXT NULL,
+    NgayDangKy TEXT NULL,
     TrangThaiDangKyHocPhan TEXT NULL
 );
 --tblDiemLopHocPhan
@@ -132,86 +153,201 @@ CREATE TABLE IF NOT EXISTS tblTaiKhoan (
     TrangThaiTaiKhoan TEXT NULL
 );
 ---- ! Them du lieu
--- tblVien
+
+-- =========================
+-- 1) tblVien (giữ nguyên)
+-- =========================
 INSERT INTO tblVien (MaVien, TenVien, TenTruongVien, SoDienThoaiVien, EmailVien, NgayThanhLapVien) VALUES
-('V001', 'Viện CNTT', 'Nguyễn Văn A', '0901111111', 'viencntt@uni.edu.vn', '01/09/2000'),
-('V002', 'Viện Kỹ thuật', 'Trần Thị B', '0902222222', 'vienkt@uni.edu.vn', '15/08/2001'),
-('V003', 'Viện Khoa học', 'Lê Văn C', '0903333333', 'vienkh@uni.edu.vn', '20/07/2002'),
-('V004', 'Viện Quản trị', 'Phạm Văn D', '0904444444', 'vienqt@uni.edu.vn', '10/06/2003');
+('V01', 'Viện Công nghệ', 'Nguyễn Văn A', '0123456789', 'vien1@univ.edu', '01/01/2010'),
+('V02', 'Viện Kinh tế', 'Trần Thị B', '0123456790', 'vien2@univ.edu', '02/02/2011'),
+('V03', 'Viện Khoa học', 'Lê Văn C', '0123456791', 'vien3@univ.edu', '03/03/2012'),
+('V04', 'Viện Ngoại ngữ', 'Phạm Thị D', '0123456792', 'vien4@univ.edu', '04/04/2013'),
+('V05', 'Viện Môi trường', 'Hoàng Văn E', '0123456793', 'vien5@univ.edu', '05/05/2014');
 
--- tblKhoa
+-- =========================
+-- 2) tblKhoa (giữ nguyên)
+-- =========================
 INSERT INTO tblKhoa (MaKhoa, TenKhoa, MaVien, TenTruongKhoa, SoDienThoaiKhoa, EmailKhoa, NgayThanhLapKhoa, MoTaKhoa, TrangThaiKhoa) VALUES
-('K001', 'Khoa CNTT', 'V001', 'Nguyễn Văn E', '0911111111', 'khoacntt@uni.edu.vn', '01/09/2000', 'Đào tạo CNTT', 'Hoạt động'),
-('K002', 'Khoa Điện', 'V002', 'Trần Thị F', '0912222222', 'khoadien@uni.edu.vn', '15/08/2001', 'Đào tạo Điện', 'Hoạt động'),
-('K003', 'Khoa KH', 'V003', 'Lê Văn G', '0913333333', 'khoakh@uni.edu.vn', '20/07/2002', 'Đào tạo KH', 'Hoạt động'),
-('K004', 'Khoa QT', 'V004', 'Phạm Văn H', '0914444444', 'khoaqt@uni.edu.vn', '10/06/2003', 'Đào tạo QT', 'Hoạt động');
+('K01', 'Khoa CNTT', 'V01', 'Nguyễn Văn F', '0987654321', 'khoa1@univ.edu', '01/01/2015', 'Công nghệ thông tin', 'Hoạt động'),
+('K02', 'Khoa Kinh tế', 'V02', 'Trần Thị G', '0987654322', 'khoa2@univ.edu', '02/02/2016', 'Kinh tế học', 'Hoạt động'),
+('K03', 'Khoa Sinh học', 'V03', 'Lê Văn H', '0987654323', 'khoa3@univ.edu', '03/03/2017', 'Sinh học', 'Hoạt động'),
+('K04', 'Khoa Tiếng Anh', 'V04', 'Phạm Thị I', '0987654324', 'khoa4@univ.edu', '04/04/2018', 'Tiếng Anh', 'Hoạt động'),
+('K05', 'Khoa Môi trường', 'V05', 'Hoàng Văn J', '0987654325', 'khoa5@univ.edu', '05/05/2019', 'Môi trường', 'Hoạt động');
 
--- tblNganh
+-- =========================
+-- 3) tblNganh (giữ nguyên)
+-- =========================
 INSERT INTO tblNganh (MaNganh, TenNganh, MaKhoa, MoTaNganh, TrangThaiNganh) VALUES
-('N001', 'Khoa học máy tính', 'K001', 'Lập trình, hệ thống', 'Hoạt động'),
-('N002', 'Kỹ thuật điện', 'K002', 'Điện, điện tử', 'Hoạt động'),
-('N003', 'Khoa học vật liệu', 'K003', 'Vật liệu mới', 'Hoạt động'),
-('N004', 'Quản trị kinh doanh', 'K004', 'Quản lý doanh nghiệp', 'Hoạt động');
+('N01', 'Công nghệ phần mềm', 'K01', 'Phần mềm', 'Hoạt động'),
+('N02', 'Kinh tế quốc tế', 'K02', 'Kinh tế', 'Hoạt động'),
+('N03', 'Sinh học phân tử', 'K03', 'Sinh học', 'Hoạt động'),
+('N04', 'Ngôn ngữ Anh', 'K04', 'Tiếng Anh', 'Hoạt động'),
+('N05', 'Quản lý môi trường', 'K05', 'Môi trường', 'Hoạt động');
 
--- tblLop
+-- ======================================
+-- 4) tblLop (đổi KhoaHoc sang 63/64)
+-- ======================================
 INSERT INTO tblLop (MaLop, KhoaHoc, TenLop, MaNganh) VALUES
-('L001', 2021, 'CNTT01', 'N001'),
-('L002', 2021, 'Dien01', 'N002'),
-('L003', 2021, 'VatLieu01', 'N003'),
-('L004', 2021, 'QT01', 'N004');
+('L01', 63, '19CNTT1', 'N01'),
+('L02', 63, '19KT1',   'N02'),
+('L03', 64, '19SH1',   'N03'),
+('L04', 64, '19TA1',   'N04'),
+('L05', 63, '19MT1',   'N05');
 
--- tblGiangVien
+-- ======================================
+-- 5) tblGiangVien (giữ nguyên)
+-- ======================================
 INSERT INTO tblGiangVien (MSGV, HoTenGV, NgaySinhGV, GioiTinhGV, QueQuanGV, EmailGV, MaNganh, SoDienThoaiGV, AnhGV, TrangThaiGV) VALUES
-('GV001', 'Nguyễn Văn I', '10/10/1980', 'Nam', 'Hà Nội', 'nguyenvani@uni.edu.vn', 'N001', '0921111111', '', 'Hoạt động'),
-('GV002', 'Trần Thị J', '12/12/1982', 'Nữ', 'Hải Phòng', 'tranthij@uni.edu.vn', 'N002', '0922222222', '', 'Hoạt động'),
-('GV003', 'Lê Văn K', '15/05/1979', 'Nam', 'Đà Nẵng', 'levank@uni.edu.vn', 'N003', '0923333333', '', 'Hoạt động'),
-('GV004', 'Phạm Văn L', '20/08/1985', 'Nam', 'Huế', 'phamvanl@uni.edu.vn', 'N004', '0924444444', '', 'Hoạt động');
+('10000001', 'Nguyễn Văn Giáo', '01/01/1980', 'Nam', 'Hà Nội', 'gv1@univ.edu', 'N01', '0901111111', '', 'Hoạt động'),
+('10000002', 'Trần Thị Giáo',   '02/02/1981', 'Nữ',  'Hải Phòng', 'gv2@univ.edu', 'N02', '0902222222', '', 'Hoạt động'),
+('10000003', 'Lê Văn Giáo',     '03/03/1982', 'Nam', 'Nam Định',  'gv3@univ.edu', 'N03', '0903333333', '', 'Hoạt động'),
+('10000004', 'Phạm Thị Giáo',   '04/04/1983', 'Nữ',  'Thái Bình', 'gv4@univ.edu', 'N04', '0904444444', '', 'Hoạt động'),
+('10000005', 'Hoàng Văn Giáo',  '05/05/1984', 'Nam', 'Nghệ An',   'gv5@univ.edu', 'N05', '0905555555', '', 'Hoạt động');
 
--- tblSinhVien
+-- ====================================================
+-- 6) tblSinhVien
+--    - Giữ 5 SV mẫu ban đầu
+--    - Thêm 10 SV cho N01 (CNTT) vào L01: 20000006..20000015
+--    - Thêm mỗi ngành N02..N05: 2 SV (tổng 8 SV): 20000016..20000023
+-- ====================================================
 INSERT INTO tblSinhVien (MSSV, HoTenSV, NgaySinhSV, GioiTinhSV, QueQuanSV, EmailSV, MaLop, SoDienThoaiSV, AnhSV, TrangThaiSV) VALUES
-('SV001', 'Phạm Văn M', '01/01/2003', 'Nam', 'Hà Nội', 'phamvanm@uni.edu.vn', 'L001', '0931111111', '', 'Hoạt động'),
-('SV002', 'Ngô Thị N', '02/02/2003', 'Nữ', 'Hải Phòng', 'ngothin@uni.edu.vn', 'L002', '0932222222', '', 'Hoạt động'),
-('SV003', 'Đỗ Văn O', '03/03/2003', 'Nam', 'Đà Nẵng', 'dovano@uni.edu.vn', 'L003', '0933333333', '', 'Hoạt động'),
-('SV004', 'Lê Thị P', '04/04/2003', 'Nữ', 'Huế', 'lethip@uni.edu.vn', 'L004', '0934444444', '', 'Hoạt động');
+('20000001', 'Nguyễn Văn Sinh',  '01/01/2002', 'Nam', 'Hà Nội',      'sv1@univ.edu',  'L01', '0911111111', '', 'Hoạt động'),
+('20000002', 'Trần Thị Sinh',    '02/02/2002', 'Nữ',  'Hải Phòng',    'sv2@univ.edu',  'L02', '0922222222', '', 'Hoạt động'),
+('20000003', 'Lê Văn Sinh',      '03/03/2002', 'Nam', 'Nam Định',     'sv3@univ.edu',  'L03', '0933333333', '', 'Hoạt động'),
+('20000004', 'Phạm Thị Sinh',    '04/04/2002', 'Nữ',  'Thái Bình',    'sv4@univ.edu',  'L04', '0944444444', '', 'Hoạt động'),
+('20000005', 'Hoàng Văn Sinh',   '05/05/2002', 'Nam', 'Nghệ An',      'sv5@univ.edu',  'L05', '0955555555', '', 'Hoạt động'),
 
--- tblHocPhan
+-- 10 SV mới cho N01 (CNTT) - L01
+('20000006', 'CNTT Sinh 06', '06/06/2002', 'Nam', 'Hà Nội',   'sv6@univ.edu',  'L01', '0960000006', '', 'Hoạt động'),
+('20000007', 'CNTT Sinh 07', '07/06/2002', 'Nữ',  'Hà Nội',   'sv7@univ.edu',  'L01', '0960000007', '', 'Hoạt động'),
+('20000008', 'CNTT Sinh 08', '08/06/2002', 'Nam', 'Hà Nội',   'sv8@univ.edu',  'L01', '0960000008', '', 'Hoạt động'),
+('20000009', 'CNTT Sinh 09', '09/06/2002', 'Nữ',  'Hà Nội',   'sv9@univ.edu',  'L01', '0960000009', '', 'Hoạt động'),
+('20000010', 'CNTT Sinh 10', '10/06/2002', 'Nam', 'Hà Nội',   'sv10@univ.edu', 'L01', '0960000010', '', 'Hoạt động'),
+('20000011', 'CNTT Sinh 11', '11/06/2002', 'Nữ',  'Hà Nội',   'sv11@univ.edu', 'L01', '0960000011', '', 'Hoạt động'),
+('20000012', 'CNTT Sinh 12', '12/06/2002', 'Nam', 'Hà Nội',   'sv12@univ.edu', 'L01', '0960000012', '', 'Hoạt động'),
+('20000013', 'CNTT Sinh 13', '13/06/2002', 'Nữ',  'Hà Nội',   'sv13@univ.edu', 'L01', '0960000013', '', 'Hoạt động'),
+('20000014', 'CNTT Sinh 14', '14/06/2002', 'Nam', 'Hà Nội',   'sv14@univ.edu', 'L01', '0960000014', '', 'Hoạt động'),
+('20000015', 'CNTT Sinh 15', '15/06/2002', 'Nữ',  'Hà Nội',   'sv15@univ.edu', 'L01', '0960000015', '', 'Hoạt động'),
+
+-- Mỗi ngành khác (N02..N05) thêm 2 SV
+('20000016', 'Kinh tế Sinh 01', '16/06/2002', 'Nam', 'Hải Phòng', 'sv16@univ.edu', 'L02', '0970000016', '', 'Hoạt động'),
+('20000017', 'Kinh tế Sinh 02', '17/06/2002', 'Nữ',  'Hải Phòng', 'sv17@univ.edu', 'L02', '0970000017', '', 'Hoạt động'),
+
+('20000018', 'Sinh học Sinh 01','18/06/2002', 'Nam', 'Nam Định',  'sv18@univ.edu', 'L03', '0970000018', '', 'Hoạt động'),
+('20000019', 'Sinh học Sinh 02','19/06/2002', 'Nữ',  'Nam Định',  'sv19@univ.edu', 'L03', '0970000019', '', 'Hoạt động'),
+
+('20000020', 'TA Sinh 01',      '20/06/2002', 'Nam', 'Thái Bình', 'sv20@univ.edu', 'L04', '0970000020', '', 'Hoạt động'),
+('20000021', 'TA Sinh 02',      '21/06/2002', 'Nữ',  'Thái Bình', 'sv21@univ.edu', 'L04', '0970000021', '', 'Hoạt động'),
+
+('20000022', 'MT Sinh 01',      '22/06/2002', 'Nam', 'Nghệ An',   'sv22@univ.edu', 'L05', '0970000022', '', 'Hoạt động'),
+('20000023', 'MT Sinh 02',      '23/06/2002', 'Nữ',  'Nghệ An',   'sv23@univ.edu', 'L05', '0970000023', '', 'Hoạt động');
+
+-- ====================================================
+-- 7) tblHocPhan
+--    - Giữ 5 học phần cũ
+--    - Thêm 3 học phần mới cho N01: HP06, HP07, HP08
+-- ====================================================
 INSERT INTO tblHocPhan (MaHocPhan, TenHocPhan, SoTinChi, HocKy, MaNganh, MoTaHocPhan) VALUES
-('HP001', 'Lập trình Java', 3, 1, 'N001', 'Java cơ bản'),
-('HP002', 'Mạch điện tử', 3, 1, 'N002', 'Điện tử cơ bản'),
-('HP003', 'Vật liệu nano', 2, 1, 'N003', 'Vật liệu nano'),
-('HP004', 'Quản trị học', 2, 1, 'N004', 'Quản trị doanh nghiệp');
+('HP01', 'Lập trình Java',     3, 1, 'N01', 'Học phần Java'),
+('HP02', 'Kinh tế vi mô',      3, 1, 'N02', 'Học phần Kinh tế'),
+('HP03', 'Sinh học đại cương', 3, 1, 'N03', 'Học phần Sinh học'),
+('HP04', 'Tiếng Anh cơ bản',   3, 1, 'N04', 'Học phần Tiếng Anh'),
+('HP05', 'Quản lý môi trường', 3, 1, 'N05', 'Học phần Môi trường'),
+-- 3 học phần mới cho CNTT (N01)
+('HP06', 'Cấu trúc dữ liệu',   3, 2, 'N01', 'Cấu trúc dữ liệu & giải thuật'),
+('HP07', 'Cơ sở dữ liệu',      3, 2, 'N01', 'Thiết kế & truy vấn CSDL'),
+('HP08', 'Mạng máy tính',      3, 3, 'N01', 'Nguyên lý mạng máy tính');
 
--- tblLopHocPhan
+-- ====================================================
+-- 8) tblLopHocPhan
+--    - Giữ 5 lớp học phần cũ
+--    - Thêm 3 lớp học phần mới cho HP06..HP08 (N01)
+-- ====================================================
 INSERT INTO tblLopHocPhan (MaLopHocPhan, TenLopHocPhan, MaHocPhan, MSGV, SoBuoi, SoTiet, SoTuanHoc, ThuTiet, PhongHoc, ThoiGianBatDau, ThoiGianKetThuc, ThoiGianHoc, SoLuongToiDa, TrangThaiLopHocPhan) VALUES
-('LHP001', 'Java 01', 'HP001', 'GV001', 15, 45, '15', 'Thứ 2', 'A101', '01/09/2025', '15/12/2025', '8:00-10:00', 40, 'Hoạt động'),
-('LHP002', 'Điện tử 01', 'HP002', 'GV002', 15, 45, '15', 'Thứ 3', 'B202', '01/09/2025', '15/12/2025', '10:00-12:00', 40, 'Hoạt động'),
-('LHP003', 'Nano 01', 'HP003', 'GV003', 12, 36, '12', 'Thứ 4', 'C303', '01/09/2025', '15/12/2025', '13:00-15:00', 35, 'Hoạt động'),
-('LHP004', 'Quản trị 01', 'HP004', 'GV004', 12, 36, '12', 'Thứ 5', 'D404', '01/09/2025', '15/12/2025', '15:00-17:00', 35, 'Hoạt động');
+('LHP01', 'Lớp Java 1',       'HP01', '10000001', 15, 45, '15', '2-4-6', 'A101', '01/09/2023', '15/12/2023', '7:00-9:00',   50, 'Đang mở'),
+('LHP02', 'Lớp Kinh tế 1',    'HP02', '10000002', 15, 45, '15', '3-5-7', 'B201', '02/09/2023', '16/12/2023', '9:00-11:00',  50, 'Đang mở'),
+('LHP03', 'Lớp Sinh học 1',   'HP03', '10000003', 15, 45, '15', '2-4-6', 'C301', '03/09/2023', '17/12/2023', '13:00-15:00', 50, 'Đang mở'),
+('LHP04', 'Lớp Tiếng Anh 1',  'HP04', '10000004', 15, 45, '15', '3-5-7', 'D401', '04/09/2023', '18/12/2023', '15:00-17:00', 50, 'Đang mở'),
+('LHP05', 'Lớp Môi trường 1', 'HP05', '10000005', 15, 45, '15', '2-4-6', 'E501', '05/09/2023', '19/12/2023', '17:00-19:00', 50, 'Đang mở'),
+-- 3 lớp học phần mới cho CNTT (N01)
+('LHP06', 'Lớp CTDL 1',       'HP06', '10000001', 15, 45, '15', '2-4-6', 'A102', '06/09/2023', '20/12/2023', '7:00-9:00',   60, 'Đang mở'),
+('LHP07', 'Lớp CSDL 1',       'HP07', '10000001', 15, 45, '15', '3-5-7', 'A103', '07/09/2023', '21/12/2023', '9:00-11:00',  60, 'Đang mở'),
+('LHP08', 'Lớp Mạng MT 1',    'HP08', '10000001', 15, 45, '15', '2-4-6', 'A104', '08/09/2023', '22/12/2023', '13:00-15:00', 60, 'Đang mở');
 
--- tblDangKyHocPhan
-INSERT INTO tblDangKyHocPhan (MaDangKyHocPhan, MSSV, MaLopHocPhan, TrangThaiDangKyHocPhan) VALUES
-('DK001', 'SV001', 'LHP001', 'Đã đăng ký'),
-('DK002', 'SV002', 'LHP002', 'Đã đăng ký'),
-('DK003', 'SV003', 'LHP003', 'Đã đăng ký'),
-('DK004', 'SV004', 'LHP004', 'Đã đăng ký');
+-- ====================================================
+-- 9) tblDangKyHocPhan (giữ nguyên 5 mẫu ban đầu)
+--    (Nếu cần DKHP cho SV mới, mình sẽ thêm theo yêu cầu)
+-- ====================================================
+INSERT INTO tblDangKyHocPhan (MaDangKyHocPhan, MSSV, MaLopHocPhan, NgayDangKy, TrangThaiDangKyHocPhan) VALUES
+('DKHP01', '20000001', 'LHP01', '01/09/2023', 'Đã đăng ký'),
+('DKHP02', '20000002', 'LHP02', '02/09/2023', 'Đã đăng ký'),
+('DKHP03', '20000003', 'LHP03', '03/09/2023', 'Đã đăng ký'),
+('DKHP04', '20000004', 'LHP04', '04/09/2023', 'Đã đăng ký'),
+('DKHP05', '20000005', 'LHP05', '05/09/2023', 'Đã đăng ký');
 
--- tblDiemLopHocPhan
+-- ====================================================
+-- 10) tblDiemLopHocPhan (giữ nguyên)
+-- ====================================================
 INSERT INTO tblDiemLopHocPhan (MaDiemLopHocPhan, MaDangKyHocPhan, DiemQuaTrinh, DiemThi, DiemTongKet, XepLoai) VALUES
-('DLHP001', 1, 8.0, 7.5, 7.8, 'Khá'),
-('DLHP002', 2, 7.0, 6.5, 6.8, 'Trung bình'),
-('DLHP003', 3, 9.0, 8.5, 8.8, 'Giỏi'),
-('DLHP004', 4, 8.5, 8.0, 8.3, 'Khá');
+('DLP01', 1, 8.0, 7.5, 7.8, 'Giỏi'),
+('DLP02', 2, 7.0, 6.5, 6.8, 'Khá'),
+('DLP03', 3, 9.0, 8.5, 8.8, 'Giỏi'),
+('DLP04', 4, 6.0, 5.5, 5.8, 'Trung bình'),
+('DLP05', 5, 5.0, 4.5, 4.8, 'Yếu');
 
--- tblDiemDanh
+-- ====================================================
+-- 11) tblDiemDanh (giữ nguyên)
+-- ====================================================
 INSERT INTO tblDiemDanh (MaDiemDanh, MaDangKyHocPhan, ChuoiDiemDanh, GhiChu) VALUES
-('DD001', 1, '111110000111', 'Đầy đủ'),
-('DD002', 2, '111111111111', 'Đầy đủ'),
-('DD003', 3, '110011001100', 'Thiếu'),
-('DD004', 4, '111100001111', 'Đầy đủ');
+('DD01', 1, '11011', 'Đủ'),
+('DD02', 2, '11101', 'Đủ'),
+('DD03', 3, '10111', 'Đủ'),
+('DD04', 4, '11110', 'Thiếu 1 buổi'),
+('DD05', 5, '11111', 'Đủ');
 
--- tblTaiKhoan
+-- ====================================================
+-- 12) tblTaiKhoan
+--     - Rút ngắn MaNguoiDung còn 3 số
+--     - Mỗi sinh viên có 1 tài khoản (23 SV)
+--     - GV & Admin cũng có tài khoản
+--     - Mật khẩu mặc định '1'
+-- ====================================================
+
+-- Admin
 INSERT INTO tblTaiKhoan (MaNguoiDung, MatKhau, ChucVu, TrangThaiTaiKhoan) VALUES
-('SV001', '123456', 'SinhVien', 'Hoạt động'),
-('GV001', 'abcdef', 'GiangVien', 'Hoạt động'),
-('AD001', 'admin', 'Admin', 'Hoạt động'),
-('SV002', '654321', 'SinhVien', 'Hoạt động');
+('00000001', '1', 'admin', 'Hoạt động');
+
+-- Giảng viên (giữ nguyên 3 số cuối như trước)
+INSERT INTO tblTaiKhoan (MaNguoiDung, MatKhau, ChucVu, TrangThaiTaiKhoan) VALUES
+('10000001', '1', 'giangvien', 'Hoạt động'), -- 10000001
+('10000002', '1', 'giangvien', 'Hoạt động'), -- 10000002
+('10000003', '1', 'giangvien', 'Hoạt động'), -- 10000003
+('10000004', '1', 'giangvien', 'Hoạt động'), -- 10000004
+('10000005', '1', 'giangvien', 'Hoạt động'); -- 10000005
+
+-- Sinh viên (MaNguoiDung = MSSV đầy đủ)
+INSERT INTO tblTaiKhoan (MaNguoiDung, MatKhau, ChucVu, TrangThaiTaiKhoan) VALUES
+('20000001', '1', 'sinhvien', 'Hoạt động'),
+('20000002', '1', 'sinhvien', 'Hoạt động'),
+('20000003', '1', 'sinhvien', 'Hoạt động'),
+('20000004', '1', 'sinhvien', 'Hoạt động'),
+('20000005', '1', 'sinhvien', 'Hoạt động'),
+('20000006', '1', 'sinhvien', 'Hoạt động'),
+('20000007', '1', 'sinhvien', 'Hoạt động'),
+('20000008', '1', 'sinhvien', 'Hoạt động'),
+('20000009', '1', 'sinhvien', 'Hoạt động'),
+('20000010', '1', 'sinhvien', 'Hoạt động'),
+('20000011', '1', 'sinhvien', 'Hoạt động'),
+('20000012', '1', 'sinhvien', 'Hoạt động'),
+('20000013', '1', 'sinhvien', 'Hoạt động'),
+('20000014', '1', 'sinhvien', 'Hoạt động'),
+('20000015', '1', 'sinhvien', 'Hoạt động'),
+('20000016', '1', 'sinhvien', 'Hoạt động'),
+('20000017', '1', 'sinhvien', 'Hoạt động'),
+('20000018', '1', 'sinhvien', 'Hoạt động'),
+('20000019', '1', 'sinhvien', 'Hoạt động'),
+('20000020', '1', 'sinhvien', 'Hoạt động'),
+('20000021', '1', 'sinhvien', 'Hoạt động'),
+('20000022', '1', 'sinhvien', 'Hoạt động'),
+('20000023', '1', 'sinhvien', 'Hoạt động');
+

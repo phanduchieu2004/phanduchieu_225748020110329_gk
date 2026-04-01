@@ -3,6 +3,7 @@ package com.example.controller.admin.quanlylop;
 import java.io.IOException;
 
 import com.example.data.ChucNangSQL;
+import com.example.model.tblLop;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -28,24 +29,13 @@ public class Them extends HttpServlet {
         final String tenLop = req.getParameter("TenLop").trim();
         final int khoaHoc = Integer.parseInt(req.getParameter("KhoaHoc"));
         final String maNganh = req.getParameter("MaNganh").trim();
-        boolean loi = false;
-        if (sql.kiemTraKhoaChinh("tblLop", "MaLop", maLop)) {
-            req.setAttribute("loiMaLop", "Mã lớp đã tồn tại");
-            loi = true;
-        }
-        if (maLop == null || maLop.isEmpty()) {
-            req.setAttribute("loiMaLop", "Mã lớp không được để trống");
-            loi = true;
-        }
-        if (tenLop == null || tenLop.isEmpty()) {
-            req.setAttribute("loiTenLop", "Tên lớp không được để trống");
-            loi = true;
-        }
-        if (maNganh == null || maNganh.isEmpty()) {
-            req.setAttribute("loiMaNganh", "Ngành không được để trống");
-            loi = true;
-        }
-        if (loi) {
+        tblLop lop = new tblLop(req);
+        lop.setMaLop(maLop);
+        lop.setTenLop(tenLop);
+        lop.setKhoaHoc(khoaHoc);
+        lop.setMaNganh(maNganh);
+
+        if (lop.bao_loi) {
             req.setAttribute("MaLop", maLop);
             req.setAttribute("TenLop", tenLop);
             req.setAttribute("KhoaHoc", khoaHoc);
@@ -56,7 +46,7 @@ public class Them extends HttpServlet {
             req.getRequestDispatcher("/admin/danhsachlop/them.jsp").forward(req, resp);
             return;
         }
-        sql.themLop(maLop, khoaHoc, tenLop, maNganh);
+        lop.them();
         req.getSession().setAttribute("thongBao", "Thêm lớp thành công");
         resp.sendRedirect(req.getContextPath() + "/admin/danhsachlop/index");
     }

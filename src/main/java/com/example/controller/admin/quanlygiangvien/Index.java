@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.data.ChucNangSQL;
+import com.example.model.tblGiangVien;
 import com.example.model.tblNganh;
 
 import jakarta.servlet.ServletException;
@@ -15,22 +16,43 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet({ "/admin/danhsachgiangvien", "/admin/danhsachgiangvien/index" })
 public class Index extends HttpServlet {
-    ChucNangSQL sql = new ChucNangSQL();
+
+    private final ChucNangSQL sql = new ChucNangSQL();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-                List<Map<String, Object>> danhsach = sql.hienThi("tblGiangVien");
-        for (Map<String, Object> i : danhsach) {
-            tblNganh nganh = new tblNganh();
-            nganh.truyVanTheoMa(i.get("MaNganh").toString());
-            i.put("TenNganh", nganh.tenNganh);
+        try {
+            sql.kiemTraDangNhap(req, resp);
+        } catch (Exception e) {
         }
-        // List<Map<String, Object>> danhsach = sql.hienThi("tblGiangVien");
+        
+        String trangThai = req.getParameter("trangThai");
+        String tenNganh = req.getParameter("tenNganh");
+        List<Map<String, Object>> allGiangVien = sql.hienThi("tblGiangVien");
 
-        // sql.boSungDS(danhsach, "TenNganh", "tblNganh", "MaNganh");
+        allGiangVien.forEach(map -> {
+            tblNganh nganh = new tblNganh();
+            nganh.truyVanTheoMa(map.get("MaNganh").toString());
+            map.put("TenNganh", nganh.tenNganh);
+
+        });
+        List<String> danhSachNganh = allGiangVien.stream()
+                .map(sv -> sv.get("TenNganh").toString())
+                .distinct().toList();
+        List<Map<String, Object>> danhsach = allGiangVien.stream()
+                .filter(sv -> trangThai == null || trangThai.isBlank()
+                        || trangThai.equalsIgnoreCase(String.valueOf(sv.get("TrangThaiGV"))))
+                .filter(sv -> tenNganh == null || tenNganh.isBlank()
+                        || tenNganh.equalsIgnoreCase(String.valueOf(sv.get("TenNganh"))))
+
+                .toList();
         req.setAttribute("danhSachGiangVien", danhsach);
+        req.setAttribute("trangThaiDaChon", trangThai);
+        req.setAttribute("tenNganhDaChon", tenNganh);
+        req.setAttribute("danhSachNganh", danhSachNganh);
         req.getRequestDispatcher("/admin/danhsachgiangvien/index.jsp").forward(req, resp);
+
     }
 
     @Override
@@ -39,7 +61,9 @@ public class Index extends HttpServlet {
         String[] gv = req.getParameterValues("MSGV");
         if (gv != null) {
             for (String ma : gv) {
-                sql.xoaBanGhi("tblGiangVien", "MSGV = '" + ma + "'");
+                tblGiangVien giangVien = new tblGiangVien();
+                giangVien.msgv = ma;
+                giangVien.xoa();
             }
         }
         req.getSession().setAttribute("thongBao", "Xóa các khoa đã chọn thành công");

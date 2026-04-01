@@ -20,8 +20,11 @@ public class Index extends HttpServlet {
             HttpServletResponse resp)
             throws ServletException, IOException {
 
+        try {
+            sql.kiemTraDangNhap(req, resp);
+        } catch (Exception e) {
+        }
         req.setAttribute("danhSachVien", sql.hienThi("tblVien"));
-
         req.getRequestDispatcher("/admin/danhsachvien/index.jsp").forward(req, resp);
     }
 

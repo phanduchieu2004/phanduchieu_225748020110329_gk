@@ -1,15 +1,19 @@
 package com.example.controller.admin.quanlynganh;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.example.data.ChucNangSQL;
+import com.example.model.tblKhoa;
+import com.example.model.tblVien;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 @WebServlet({ "/admin/danhsachnganh", "/admin/danhsachnganh/index" })
 public class Index extends HttpServlet {
@@ -18,29 +22,31 @@ public class Index extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
+        try {
+            sql.kiemTraDangNhap(req, resp);
+        } catch (Exception e) {
+        }
         List<Map<String, Object>> danhsach = sql.hienThi("tblNganh");
 
-        sql.boSungDS(danhsach, "TenKhoa", "tblKhoa", "MaKhoa");
-
-        sql.boSungDS_TruyVanLong(
-            danhsach,
-            "TenVien",
-            "tblVien",
-            "MaVien",
-            "tblKhoa",
-            "MaKhoa"
-        );
+        for (Map<String, Object> map : danhsach) {
+            tblKhoa khoa = new tblKhoa();
+            khoa.truyVanTheoMa(map.get("MaKhoa").toString());
+            map.put("TenKhoa", khoa.tenKhoa);
+            tblVien vien = new tblVien();
+            vien.truyVanTheoMa(khoa.maVien);
+            map.put("TenVien", vien.tenVien);
+        }
 
         req.setAttribute("danhSachNganh", danhsach);
         req
-            .getRequestDispatcher("/admin/danhsachnganh/index.jsp")
-            .forward(req, resp);
+                .getRequestDispatcher("/admin/danhsachnganh/index.jsp")
+                .forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         String[] maNganh = req.getParameterValues("MaNganh");
         System.out.println("Đã vào hàm doPost xóa ngành");
         System.out.println("MaNganh nhận được: " + Arrays.toString(maNganh));
@@ -50,8 +56,8 @@ public class Index extends HttpServlet {
             }
         }
         req
-            .getSession()
-            .setAttribute("thongBao", "Xóa các ngành đã chọn thành công");
+                .getSession()
+                .setAttribute("thongBao", "Xóa các ngành đã chọn thành công");
         resp.sendRedirect(req.getContextPath() + "/admin/danhsachnganh");
     }
 }

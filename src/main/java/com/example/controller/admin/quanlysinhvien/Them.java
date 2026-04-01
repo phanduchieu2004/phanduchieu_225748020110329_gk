@@ -1,8 +1,12 @@
 package com.example.controller.admin.quanlysinhvien;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import com.example.data.ChucNangSQL;
+import com.example.model.tblNganh;
+import com.example.model.tblSinhVien;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -20,7 +24,16 @@ public class Them extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        req.setAttribute("danhSachLop", sql.hienThi("tblLop"));
+        List<Map<String, Object>> danhSachLop = sql.hienThi("tblLop");
+        for (Map<String, Object> map : danhSachLop) {
+            tblNganh nganh = new tblNganh();
+            System.out.println("MaNganh: " + map.get("MaNganh").toString());
+            nganh.truyVanTheoMa(map.get("MaNganh").toString());
+            System.out.println("TenNganh: " + nganh.tenNganh);
+            map.put("TenNganh", nganh.tenNganh);
+        }
+        req.setAttribute("danhSachLop", danhSachLop);
+
         req.getRequestDispatcher("/admin/danhsachsinhvien/them.jsp").forward(req, resp);
     }
 
@@ -37,36 +50,19 @@ public class Them extends HttpServlet {
         final String soDienThoaiSV = req.getParameter("SoDienThoaiSV").trim();
 
         Part fileAnh = req.getPart("AnhSV");
-        boolean loi = false;
-        if (sql.kiemTraKhoaChinh("tblSinhVien", "MSSV", mssv)) {
-            req.setAttribute("loiMSSV", "Mã sinh viên đã tồn tại");
-            loi = true;
-        }
-        if (mssv == null || mssv.isEmpty()) {
-            req.setAttribute("loiMSSV", "Mã sinh viên không được để trống");
-            loi = true;
-        }
-        if (hoTenSV == null || hoTenSV.isEmpty()) {
-            req.setAttribute("loiHoTenSV", "Họ tên không được để trống");
-            loi = true;
-        }
-        if (ngaySinhSV == null || ngaySinhSV.isEmpty()) {
-            req.setAttribute("loiNgaySinhSV", "Ngày sinh không được để trống");
-            loi = true;
-        }
-        if (gioiTinhSV == null || gioiTinhSV.isEmpty()) {
-            req.setAttribute("loiGioiTinhSV", "Giới tính không được để trống");
-            loi = true;
-        }
-        if (maLop == null || maLop.isEmpty()) {
-            req.setAttribute("loiMaLop", "Lớp không được để trống");
-            loi = true;
-        }
-        if (fileAnh == null || fileAnh.getSize() == 0) {
-            req.setAttribute("loiAnhSV", "Ảnh sinh viên không được để trống");
-            loi = true;
-        }
-        if (loi) {
+
+        tblSinhVien sv = new tblSinhVien(req);
+        sv.setMSSV(mssv);
+        sv.setHoTenSV(hoTenSV);
+        sv.setNgaySinhSV(ngaySinhSV);
+        sv.setGioiTinhSV(gioiTinhSV);
+        sv.setQueQuanSV(queQuanSV);
+        sv.setEmailSV(emailSV);
+        sv.setMaLop(maLop);
+        sv.setSoDienThoaiSV(soDienThoaiSV);
+        sv.setAnhSV(fileAnh);
+
+        if (sv.bao_loi) {
             req.setAttribute("MSSV", mssv);
             req.setAttribute("HoTenSV", hoTenSV);
             req.setAttribute("NgaySinhSV", ngaySinhSV);
@@ -82,13 +78,8 @@ public class Them extends HttpServlet {
             req.getRequestDispatcher("/admin/danhsachsinhvien/them.jsp").forward(req, resp);
             return;
         }
-        sql.themFile(fileAnh, req.getServletContext());
-        if (fileAnh != null) {
-            // !TODO: Xử lý cơ sở dữ liệu trước
-            // sql.themSinhVien(mssv, hoTenSV, ngaySinhSV, gioiTinhSV, queQuanSV, emailSV,
-            // maLop, soDienThoaiSV,
-            // fileAnh.getSubmittedFileName());
-        }
+        sv.them();
+
         req.getSession().setAttribute("thongBao", "Thêm sinh viên thành công");
         resp.sendRedirect(req.getContextPath() + "/admin/danhsachsinhvien/index");
     }

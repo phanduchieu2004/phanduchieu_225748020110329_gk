@@ -18,17 +18,13 @@ public class Xoa extends HttpServlet {
     protected void doGet(HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
-
         String maVien = req.getParameter("MaVien");
         // ? Xóa viện theo Mã Viện
         tblVien vien = new tblVien();
         vien.maVien = maVien;
         vien.xoa();
-
         req.setAttribute("thongBao", "Xóa viện thành công");
         req.getRequestDispatcher(req.getContextPath() + "/admin/danhsachvien").forward(req, resp);
     }
 
 }
-
-// !Ditme Mấy thằng chim bé

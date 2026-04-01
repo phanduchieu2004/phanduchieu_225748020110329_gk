@@ -3,6 +3,7 @@ package com.example.controller.admin.quanlykhoa;
 import java.io.IOException;
 
 import com.example.data.ChucNangSQL;
+import com.example.model.tblKhoa;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -30,27 +31,20 @@ public class Them extends HttpServlet {
         final String tenTruongKhoa = req.getParameter("TenTruongKhoa").trim();
         final String soDienThoaiKhoa = req.getParameter("SoDienThoaiKhoa").trim();
         final String emailKhoa = req.getParameter("EmailKhoa").trim();
-        final String ngayThanhLapKhoa = req.getParameter("NgayThanhLapKhoa").trim();
+        final String ngayThanhLapKhoa = sql.doiDinhDangNgay(req.getParameter("NgayThanhLapKhoa").trim());
         final String moTaKhoa = req.getParameter("MoTaKhoa").trim();
 
-        boolean loi = false;
-        if (sql.kiemTraKhoaChinh("tblKhoa", "MaKhoa", maKhoa)) {
-            req.setAttribute("loiMaKhoa", "Mã khoa đã tồn tại");
-            loi = true;
-        }
-        if (maKhoa == null || maKhoa.isEmpty()) {
-            req.setAttribute("loiMaKhoa", "Mã khoa không được để trống");
-            loi = true;
-        }
-        if (tenKhoa == null || tenKhoa.isEmpty()) {
-            req.setAttribute("loiTenKhoa", "Tên khoa không được để trống");
-            loi = true;
-        }
-        if (maVien == null || maVien.isEmpty()) {
-            req.setAttribute("loiMaVien", "Viện không được để trống");
-            loi = true;
-        }
-        if (loi) {
+        tblKhoa khoa = new tblKhoa(req);
+        khoa.setMaKhoa(maKhoa);
+        khoa.setTenKhoa(tenKhoa);
+        khoa.setMaVien(maVien);
+        khoa.setTenTruongKhoa(tenTruongKhoa);
+        khoa.setSoDienThoaiKhoa(soDienThoaiKhoa);
+        khoa.setEmailKhoa(emailKhoa);
+        khoa.setNgayThanhLapKhoa(ngayThanhLapKhoa);
+        khoa.moTaKhoa = moTaKhoa;
+
+        if (khoa.bao_loi) {
             req.setAttribute("MaKhoa", maKhoa);
             req.setAttribute("TenKhoa", tenKhoa);
             req.setAttribute("MaVien", maVien);
@@ -63,9 +57,8 @@ public class Them extends HttpServlet {
             req.getRequestDispatcher("/admin/danhsachkhoa/them.jsp").forward(req, resp);
             return;
         }
+        khoa.them();
 
-        // sql.themKhoa(maKhoa, tenKhoa, maVien, tenTruongKhoa, soDienThoaiKhoa,
-        // emailKhoa, ngayThanhLapKhoa, moTaKhoa);
         req.getSession().setAttribute("thongBao", "Thêm khoa thành công");
         resp.sendRedirect(req.getContextPath() + "/admin/danhsachkhoa/index");
     }

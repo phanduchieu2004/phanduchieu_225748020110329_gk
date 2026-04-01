@@ -1,5 +1,8 @@
 package com.example.model;
 
+import java.util.List;
+import java.util.Map;
+
 import com.example.data.ChucNangSQL;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +13,7 @@ public class tblDangKyHocPhan {
     public String maDangKyHocPhan;
     public String mssv;
     public String maLopHocPhan;
+    public String ngayDangKy;
     public String trangThaiDangKyHocPhan;
     public HttpServletRequest request;
     public Boolean bao_loi = false;
@@ -22,29 +26,33 @@ public class tblDangKyHocPhan {
     }
 
     public void them() {
-        sql.themDangKyHocPhan(maDangKyHocPhan, mssv, maLopHocPhan, trangThaiDangKyHocPhan);
+        sql.themDangKyHocPhan(maDangKyHocPhan, mssv, maLopHocPhan, ngayDangKy, trangThaiDangKyHocPhan);
+        sql.themDiemLopHocPhan("D" + mssv + "L" + maLopHocPhan, maDangKyHocPhan, null, null, null, "Chưa có điểm");
     }
 
     public void them(tblDangKyHocPhan d) {
-        sql.themDangKyHocPhan(d.maDangKyHocPhan, d.mssv, d.maLopHocPhan, d.trangThaiDangKyHocPhan);
+        sql.themDangKyHocPhan(d.maDangKyHocPhan, d.mssv, d.maLopHocPhan, d.ngayDangKy, d.trangThaiDangKyHocPhan);
+        sql.themDiemLopHocPhan("D" + mssv + "L" + maLopHocPhan, maDangKyHocPhan, null, null, null, "Chưa có điểm");
     }
 
     public void sua() {
-        sql.suaDangKyHocPhan(maDangKyHocPhan, mssv, maLopHocPhan, trangThaiDangKyHocPhan);
+        sql.suaDangKyHocPhan(maDangKyHocPhan, mssv, maLopHocPhan, ngayDangKy, trangThaiDangKyHocPhan);
     }
 
     public void sua(tblDangKyHocPhan d) {
-        sql.suaDangKyHocPhan(d.maDangKyHocPhan, d.mssv, d.maLopHocPhan, d.trangThaiDangKyHocPhan);
+        sql.suaDangKyHocPhan(d.maDangKyHocPhan, d.mssv, d.maLopHocPhan, d.ngayDangKy, d.trangThaiDangKyHocPhan);
     }
 
     public void xoa() {
         sql.xoaBanGhi("tblDangKyHocPhan", "MaDangKyHocPhan = '" + maDangKyHocPhan + "'");
+        sql.xoaBanGhi("tblDiemLopHocPhan", "MaDangKyHocPhan = '" + maDangKyHocPhan + "'");
     }
 
     public void truyVanTheoMa(String ma) {
         this.maDangKyHocPhan = ma;
         this.mssv = sql.timKiem("MSSV", "tblDangKyHocPhan", "MaDangKyHocPhan='" + ma + "'");
         this.maLopHocPhan = sql.timKiem("MaLopHocPhan", "tblDangKyHocPhan", "MaDangKyHocPhan='" + ma + "'");
+        this.ngayDangKy = sql.timKiem("NgayDangKy", "tblDangKyHocPhan", "MaDangKyHocPhan='" + ma + "'");
         this.trangThaiDangKyHocPhan = sql.timKiem("TrangThaiDangKyHocPhan", "tblDangKyHocPhan",
                 "MaDangKyHocPhan='" + ma + "'");
     }
@@ -72,6 +80,10 @@ public class tblDangKyHocPhan {
         }
     }
 
+    public void setNgayDangKy(String ngayDangKy) {
+        this.ngayDangKy = ngayDangKy;
+    }
+
     public void setTrangThaiDangKyHocPhan(String trangThai) {
         if (trangThai == null || trangThai.trim().isEmpty()) {
             request.setAttribute("loiTrangThaiDangKyHocPhan", "Trạng thái đăng ký học phần không được để trống");
@@ -82,6 +94,12 @@ public class tblDangKyHocPhan {
     }
 
     // *get
+    public Integer getSoLuongDangKy() {
+        List<Map<String, Object>> danhSach = sql.hienThi("tblDangKyHocPhan");
+        Integer soLuongDangKy = danhSach.size();
+        return soLuongDangKy;
+    }
+
     public String getHoTenSV() {
         String hoTenSV = sql.timKiem("HoTen", "tblSinhVien",
                 "MSSV = (SELECT MSSV FROM tblDangKyHocPhan WHERE MaDangKyHocPhan = '" + maDangKyHocPhan + "')");

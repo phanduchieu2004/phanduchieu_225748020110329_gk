@@ -42,7 +42,6 @@
     <div class="error-container">
         <h1 class="error-code">404</h1>
         <p class="error-message">Không tìm thấy trang</p>
-        <p>Có nịt mà tìm</p>
         <a href="/" class="home-link">Về trang chủ</a>
     </div>
 </body>

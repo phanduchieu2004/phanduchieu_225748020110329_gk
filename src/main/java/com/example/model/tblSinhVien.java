@@ -1,8 +1,11 @@
 package com.example.model;
 
+import java.io.IOException;
+
 import com.example.data.ChucNangSQL;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 
 public class tblSinhVien {
     ChucNangSQL sql = new ChucNangSQL();
@@ -154,12 +157,12 @@ public class tblSinhVien {
         }
     }
 
-    public void setAnhSV(String anh) {
-        if (anh == null || anh.trim().isEmpty()) {
-            this.anhSV = "";
-        } else {
-            this.anhSV = anh;
+    public void setAnhSV(Part anh) throws IOException {
+        if (anh.getSubmittedFileName() == null || anh.getSubmittedFileName().isEmpty()) {
+            // ? chiu
+            return;
         }
+        this.anhSV = sql.themFile_Ma(anh, request.getServletContext(), mssv);
     }
 
     public void setTrangThaiSV(String trangThai) {

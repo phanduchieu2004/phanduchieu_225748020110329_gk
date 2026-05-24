@@ -1,3 +1,8 @@
-FROM tomcat:10
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+WORKDIR /app
 
-COPY target/ROOT.war /usr/local/tomcat/webapps/ROOT.war
+COPY . .
+RUN mvn clean package
+
+FROM tomcat:10
+COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war

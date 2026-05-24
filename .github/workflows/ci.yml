@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,11 +23,5 @@ jobs:
     - name: Build Docker image
       run: docker build -t demo-app .
 
-    - name: Stop old container
-      run: docker stop demo || true
-
-    - name: Remove old container
-      run: docker rm demo || true
-
-    - name: Run new container
-      run: docker run -d -p 8080:8080 --name demo demo-app
+    # ❌ XÓA phần docker run đi
+    # GitHub không chạy web container kiểu này

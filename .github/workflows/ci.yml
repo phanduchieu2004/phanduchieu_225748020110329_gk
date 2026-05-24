@@ -15,7 +15,9 @@ jobs:
     - name: Setup Java
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
+      distribution: 'temurin'
+      java-version: '21'
+
 
     - name: Build WAR
       run: mvn clean package
@@ -23,5 +25,3 @@ jobs:
     - name: Build Docker image
       run: docker build -t demo-app .
 
-    # ❌ XÓA phần docker run đi
-    # GitHub không chạy web container kiểu này

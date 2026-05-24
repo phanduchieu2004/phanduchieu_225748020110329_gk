@@ -18,8 +18,5 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Build WAR
-      run: mvn clean package
-
     - name: Build Docker image
       run: docker build -t demo-app .
